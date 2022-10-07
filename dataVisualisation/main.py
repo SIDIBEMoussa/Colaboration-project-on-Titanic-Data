@@ -14,7 +14,7 @@ def loadData(file):
 
 def plotPieCaseRepartitionByContinent(df):
     continent = df.continent.dropna().unique().tolist()
-    caseList = df.groupby(df.continent).total_cases.sum().values
+    caseList = df.groupby(df.continent).total_cases.max().values
     caseList = caseList / np.sum(caseList) * 100
     fig, ax1= plt.subplots()
     ax1.set_title("percentage repartition of total covid cases by continent")
@@ -29,7 +29,7 @@ def plotPieCaseRepartitionByContinent(df):
 
 def plotCaseRepartitionByContinent(df):
     continent = df.continent.dropna().unique().tolist()
-    caseList = df.groupby(df.continent).total_cases.sum().values
+    caseList = df.groupby(df.continent).total_cases.max().values
     plt.title('Continantal total case distribution')
     
     plt.xlabel("Continent")
@@ -56,7 +56,8 @@ def plotTotalCasesOverTimeForCountry(df, country):
     plt.savefig("figures/curvOfCovidTotalCasesOvertime.png")
     plt.close()
 
-
+# plot a map 
+# with color gradiant to indicate to number of cases
 def plotCoolMap(df, geoJson):
     jsonURL= 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data'
     country_shapes = f'{jsonURL}/world-countries.json'
@@ -90,13 +91,13 @@ def plotCoolMap(df, geoJson):
     nan_fill_color='white',
     fill_opacity=0.7,
     line_opacity=0.2,
-    legend_name='total cases'
+    legend_name='total cases pear country'
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
     m.save("figures/coolMap.html")
 
-
+# main function to run to plot the different plots
 def main():
     if not os.path.isdir("figures/"): os.mkdir("figures/")
     if not os.path.isdir("data/"): os.mkdir("data/")
@@ -110,16 +111,23 @@ def main():
 
     # 
     #  first ploting a bar plot to visualise the continental distribution of the total cases 
+    # bar plot are super usefull to quickly visualise the distribution
     plotCaseRepartitionByContinent(df)
 
     # plot the same data as a pie chart to see whitch continent  has been hiten the most
+    # after seeing the distribution, the pie chart can really help
+    # by giving percentage which countries have been the most hitten, specially compared to the others.
     plotPieCaseRepartitionByContinent(df)
 
     #  plot the evolution of cases over time for several country,
     # it help to  see how the countries treated the pendemic
+    # after having global data on distribution, let's see a bit more in detail what happen for some countries
     plotTotalCasesOverTimeForCountry(df, "FRA")
     plotTotalCasesOverTimeForCountry(df, "USA")
+
     # plot a map to see whitch country has the most  cases
+    # now let's back on a more global visualisation on the covid cases
+    # the map really  help, due the gradiant to identify the countries that had the most cases
     plotCoolMap(df, "custom.geo.json")
 
 
